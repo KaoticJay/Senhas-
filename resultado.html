@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="result">
+        <div class="info">
+            <div id="resultado"></div>
+        </div>
+        <div class="ultimas-senhas" id="ultimasSenhas">
+            <!-- As últimas senhas chamadas aparecerão aqui -->
+        </div>
+        <!-- Elemento de áudio para reprodução -->
+        <audio id="audio" src="som_senha.mp3"></audio>
+    </div>
+
+    <script>
+        const cores = {
+            "Jane": "#ff0000",
+            "Luana": "#0000ff",
+            "Osmair": "#008000",
+            "Amanda": "#ffa500",
+            "Arthur": "#800080",
+            "Andreia": "#ff00ff"
+        };
+
+        const socket = new WebSocket('ws://' + window.location.hostname + ':3000');
+
+        socket.addEventListener('message', function (event) {
+            console.log('Mensagem recebida do servidor', event.data);
+
+            const dados = JSON.parse(event.data);
+
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = 
+                `<div class="text">
+                    <div>
+                        <p class="sala" style="font-size: 74px">Sala: ${dados.sala}</p>
+                        <p style="font-size: 80px;">Senha: N° ${dados.senha}</p>
+                        <p class="dr" style="color: ${cores[dados.dr]}; font-size: 80px">Dr(a): ${dados.dr}</p>
+                    </div>
+                </div>`;
+
+            let ultimasSenhas = JSON.parse(localStorage.getItem('ultimasSenhas')) || [];
+            ultimasSenhas.push({ senha: dados.senha, dr: dados.dr });
+            if (ultimasSenhas.length > 5) {
+                ultimasSenhas.shift();
+            }
+
+            localStorage.setItem('ultimasSenhas', JSON.stringify(ultimasSenhas));
+
+            const ultimasSenhasDiv = document.getElementById('ultimasSenhas');
+            ultimasSenhasDiv.innerHTML = '';
+            ultimasSenhas.forEach(item => {
+                const senhaItem = document.createElement('div');
+                senhaItem.classList.add('senha-item');
+                senhaItem.textContent = `Senha N° ${item.senha} - Dr(a): ${item.dr}`;
+                ultimasSenhasDiv.appendChild(senhaItem);
+            });
+
+            const audio = document.getElementById('audio');
+            audio.play();
+        });
+
+        window.onload = function() {
+            let dados = localStorage.getItem('dadosFormulario');
+            if (dados) {
+                dados = JSON.parse(dados);
+                atualizarDados(dados);
+            }
+        };
+
+        function atualizarDados(dados) {
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = 
+                `<div class="text">
+                    <div>
+                        <p class="sala" style="font-size: 50px">Sala: ${dados.sala}</p>
+                        <p style="font-size: 80px;">Senha: N° ${dados.senha}</p>
+                        <p class="dr" style="color: ${cores[dados.dr]}; font-size: 80px">Dr(a): ${dados.dr}</p>
+                    </div>
+                </div>`;
+
+            let ultimasSenhas = JSON.parse(localStorage.getItem('ultimasSenhas')) || [];
+            ultimasSenhas.push({ senha: dados.senha, dr: dados.dr });
+            if (ultimasSenhas.length > 5) {
+                ultimasSenhas.shift();
+            }
+
+            localStorage.setItem('ultimasSenhas', JSON.stringify(ultimasSenhas));
+
+            const ultimasSenhasDiv = document.getElementById('ultimasSenhas');
+            ultimasSenhasDiv.innerHTML = '';
+            ultimasSenhas.forEach(item => {
+                const senhaItem = document.createElement('div');
+                senhaItem.classList.add('senha-item');
+                senhaItem.textContent = `Senha N° ${item.senha} - Dr(a): ${item.dr}`;
+                ultimasSenhasDiv.appendChild(senhaItem);
+            });
+        }
+    </script>
+</body>
+</html>

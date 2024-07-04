@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senha|Servidor</title>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <form id="formulario">
+            <div class="form-group">
+                <label for="sala">Sala:</label>
+                <select class="form-control" id="sala" name="sala" required>
+                    <option value="" disabled selected>Selecione a Sala</option>
+                    <option value="Sala de Ultrasson 1">Sala de Ultrasson 1</option>
+                    <option value="Consultorio G.O 2">Consultorio G.O 2</option>
+                    <option value="Consultorio Clinico 2">Consultorio Clinico 2</option>
+                    <option value="Consultorio Pediatria 3">Consultorio Pediatria 3</option>
+                    <option value="Pre Consulta">Pre Consulta</option>
+                    
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="senha">Senha:</label>
+                <input type="text" class="form-control" id="senha" name="senha" required>
+            </div>
+            <div class="form-group">
+                <label for="dr">Dr(a):</label>
+                <select class="form-control" id="dr" name="dr" required>
+                    <option value="" disabled selected>Selecione o Dr(a)</option>
+                    <option value="Jane">Jane</option>
+                    <option value="Luana">Luana</option>
+                    <option value="Osmair">Osmair</option>
+                    <option value="Amanda">Amanda</option>
+                    <option value="Arthur">Arthur</option>
+                    <option value="Andreia">Andreia</option>
+                    <option value=""></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-custom">Enviar</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('formulario').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const sala = document.getElementById('sala').value;
+            const senha = document.getElementById('senha').value;
+            const dr = document.getElementById('dr').value;
+
+            const dados = { sala, senha, dr };
+
+            const socket = new WebSocket('ws://' + window.location.hostname + ':3000');
+
+            socket.addEventListener('open', function () {
+                socket.send(JSON.stringify(dados));
+                socket.close();
+            });
+        });
+    </script>
+</body>
+</html>
